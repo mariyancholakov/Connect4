@@ -80,7 +80,7 @@ static int score_board(const Board *b)
     return score;
 }
 
-static int minimax(Board *b, int depth, int is_maximizing)
+static int minimax_ab(Board *b, int depth, int alpha, int beta, int is_maximizing)
 {
     if (board_check_win(b, AI))
         return 100000;
@@ -104,10 +104,14 @@ static int minimax(Board *b, int depth, int is_maximizing)
             if (board_check_win(b, AI))
                 score = 100000;
             else
-                score = minimax(b, depth - 1, 0);
+                score = minimax_ab(b, depth - 1, alpha, beta, 0);
             board_undo_drop(b, col);
             if (score > best)
                 best = score;
+            if (best > alpha)
+                alpha = best;
+            if (beta <= alpha)
+                break;
         }
         return best;
     }
@@ -124,10 +128,14 @@ static int minimax(Board *b, int depth, int is_maximizing)
             if (board_check_win(b, PLAYER))
                 score = -100000;
             else
-                score = minimax(b, depth - 1, 1);
+                score = minimax_ab(b, depth - 1, alpha, beta, 1);
             board_undo_drop(b, col);
             if (score < best)
                 best = score;
+            if (best < beta)
+                beta = best;
+            if (beta <= alpha)
+                break;
         }
         return best;
     }
@@ -137,6 +145,8 @@ int ai_best_move(Board *b, int depth)
 {
     int best_score = INT_MIN;
     int best_col = -1;
+    int alpha = INT_MIN;
+    int beta  = INT_MAX;
 
     for (int i = 0; i < COLS; i++)
     {
@@ -149,7 +159,7 @@ int ai_best_move(Board *b, int depth)
         if (board_check_win(b, AI))
             score = 100000;
         else
-            score = minimax(b, depth - 1, 0);
+            score = minimax_ab(b, depth - 1, alpha, beta, 0);
         board_undo_drop(b, col);
 
         if (best_col == -1 || score > best_score)
@@ -157,6 +167,8 @@ int ai_best_move(Board *b, int depth)
             best_score = score;
             best_col = col;
         }
+        if (best_score > alpha)
+            alpha = best_score;
     }
 
     return best_col;
