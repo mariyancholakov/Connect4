@@ -2,6 +2,7 @@
 #include "board.h"
 #include "ai.h"
 #include <stdio.h>
+#include <time.h>
 
 int ui_select_difficulty(void)
 {
@@ -101,9 +102,14 @@ void game_run_singleplayer(int difficulty)
             return;
         }
 
-        int ai_col = ai_best_move(&b, depth);
+        int ai_score = 0;
+        clock_t t0 = clock();
+        int ai_col = ai_best_move_scored(&b, depth, &ai_score);
+        clock_t t1 = clock();
+        long ms = (long)((t1 - t0) * 1000 / CLOCKS_PER_SEC);
         board_drop(&b, ai_col, AI);
-        printf("AI plays column %d.\n", ai_col);
+        printf("AI thinking time: %ld ms\n", ms);
+        printf("AI played column %d (score: %d)\n", ai_col, ai_score);
 
         if (board_check_win(&b, AI))
         {

@@ -1,6 +1,7 @@
 #include "ai.h"
 #include "board.h"
 #include <limits.h>
+#include <stddef.h>
 
 static const int COL_ORDER[COLS] = {3, 2, 4, 1, 5, 0, 6};
 
@@ -141,7 +142,7 @@ static int minimax_ab(Board *b, int depth, int alpha, int beta, int is_maximizin
     }
 }
 
-int ai_best_move(Board *b, int depth)
+int ai_best_move_scored(Board *b, int depth, int *out_score)
 {
     int best_score = INT_MIN;
     int best_col = -1;
@@ -171,5 +172,12 @@ int ai_best_move(Board *b, int depth)
             alpha = best_score;
     }
 
+    if (out_score)
+        *out_score = best_score;
     return best_col;
+}
+
+int ai_best_move(Board *b, int depth)
+{
+    return ai_best_move_scored(b, depth, NULL);
 }
