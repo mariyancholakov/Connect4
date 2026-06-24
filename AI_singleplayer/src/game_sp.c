@@ -38,7 +38,7 @@ static int prompt_human_move(const Board *b)
     int col;
     while (1)
     {
-        printf("Your move (0-6): ");
+        printf("Your move(X): ");
         int r = scanf("%d", &col);
         if (r == EOF)
             return -1;

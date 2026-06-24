@@ -74,3 +74,20 @@ int board_is_full(const Board *b) {
             return 0;
     return 1;
 }
+
+int board_undo_drop(Board *b, int col) {
+    for (int r = 0; r < ROWS; r++) {
+        if (b->grid[r][col] != EMPTY) {
+            b->grid[r][col] = EMPTY;
+            return r;
+        }
+    }
+    return -1;
+}
+
+void board_get_valid_cols(const Board *b, int *cols, int *count) {
+    *count = 0;
+    for (int c = 0; c < COLS; c++)
+        if (b->grid[0][c] == EMPTY)
+            cols[(*count)++] = c;
+}
